@@ -1,0 +1,62 @@
+import { Avatar, Card, Empty } from 'antd';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { LANGUAGE_LOGO } from '../../constants/languageLogo';
+import popupSearchState from '../../recoil/popupSearch';
+import Search from './Search';
+const { Meta } = Card;
+
+const ListPlace = ({ places }) => {
+	const popupState = useRecoilValue(popupSearchState);
+	return (
+		<div className="flex mt-12 mb-12">
+			<div
+				className={`flex h-auto flex-wrap justify-center ${
+					popupState && 'w-2/3'
+				}`}
+			>
+				{!places || places.length <= 0 ? (
+					<Empty className="mt-24" />
+				) : (
+					places.map((place) => (
+						<Link to={`/massage-places/${place.id}`}>
+							<Card
+								className="mx-6 my-4 relative"
+								hoverable
+								style={{ width: 280, height: 450 }}
+								cover={
+									<img
+										alt="example"
+										src="https://cdn.spafinder.com/2015/08/massage.jpg"
+										className="h-80 w-full object-cover"
+									/>
+								}
+							>
+								<Avatar.Group
+									className="absolute top-0 right-0"
+									maxCount={2}
+									maxPopoverTrigger="click"
+									size="large"
+									maxStyle={{
+										color: '#f56a00',
+										backgroundColor: '#fde3cf',
+										cursor: 'pointer',
+									}}
+								>
+									{place.serviceLanguages.map((serviceLanguage) => (
+										<Avatar src={LANGUAGE_LOGO[serviceLanguage.language]} />
+									))}
+								</Avatar.Group>
+								<Meta title={place.name} description={place.address} />
+							</Card>
+						</Link>
+					))
+				)}
+			</div>
+			<div className="flex-1">{popupState && <Search />}</div>
+		</div>
+	);
+};
+
+export default ListPlace;
