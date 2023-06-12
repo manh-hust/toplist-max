@@ -16,15 +16,19 @@ Fetch api: Axios
 
 ## Run project
 
-Step1:
+Step 1:
 
 ### `cd project_name`
 
-Step2:
+Step 2:
+
+### `cp .env.example .env`
+
+Step 3:
 
 ### `npm install`
 
-Step3:
+Step 4:
 
 ### `npm start`
 
