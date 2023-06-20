@@ -15,7 +15,9 @@ const Header = () => {
 					<h1 className="text-xl font-bold mr-8">
 						<Link to="/">Home</Link>
 					</h1>
-					<h1 className="text-xl font-bold">Write review</h1>
+					<h1 className="text-xl font-bold">
+						<Link to ="/WriteReview">Write review</Link>
+					</h1>
 				</div>
 			</div>
 			<div className="flex">

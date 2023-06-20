@@ -1,17 +1,23 @@
 import Comment from '@ant-design/compatible/lib/comment';
 import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Empty, Input, Rate, Tooltip } from 'antd';
+import { Avatar, Button, Card, Empty, Input, Rate, Tooltip , Form} from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import { LANGUAGE_LOGO } from '../../constants/languageLogo';
 import MainLayout from '../../layouts/MainLayout';
+// import ListStaff from './ListStaff';
+
+
+
 const { Meta } = Card;
 
 const DetailPlace = () => {
 	const { slug } = useParams();
 	const [place, setPlace] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [comments, setComments] = useState([]);
+	const [staffs, setStaffs] = useState([]);
 
 	useEffect(() => {
 		const fetchPlace = async () => {
@@ -26,6 +32,36 @@ const DetailPlace = () => {
 		fetchPlace();
 	}, [slug]);
 
+	useEffect(() => {
+		const fetchComments = async () => {
+		  try {
+			const response = await axiosClient.get(`/massage-places/${slug}/comments`);
+			setComments(response.data);
+			setLoading(false);
+		  } catch (error) {
+			console.error(error);
+		  }
+		};
+		if (place){
+			fetchComments();
+		}
+	  }, [place, slug]);
+
+	  useEffect(() => {
+		const fetchStaffs = async () => {
+		  try {
+			const response = await axiosClient.get(`/massage-places/${slug}/staffs`);
+			setStaffs(response.data);
+			setLoading(false);
+		  } catch (error) {
+			console.error(error);
+		  }
+		};
+		if (place){
+			fetchStaffs();
+		}
+	  }, [place, slug]);
+
 	return (
 		<MainLayout>
 			{!loading ? (
@@ -35,7 +71,7 @@ const DetailPlace = () => {
 							<Card
 								className="mx-6 my-4 relative"
 								hoverable
-								style={{ width: 360, height: 560 }}
+								style={{ width: 360, height: 500 }}
 								cover={
 									<img
 										alt="example"
@@ -92,108 +128,83 @@ const DetailPlace = () => {
 							<Button type="primary mb-12" ghost>
 								More infomation
 							</Button>
-							<div className="flex items-center">
-								<span className="text-xl mr-4">Staff list</span>
-								<div>
-									<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
-									<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
-									<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
-									<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
-									<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
-									<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
-								</div>
+						</div>
+						<div className='mt-2 w-3/3'>
+							<div className='mb-12 flex items-center'>
+								<button className='bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 border-b-4 border-yellow-700 hover:border-yellow-500 rounded-full'>
+									Report
+								</button>
 							</div>
 						</div>
 					</div>
+					<div className='my-20 flex w-full justify-center'>
+						
+						<div className="flex items-center">
+							<button className='bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 border-b-4 border-yellow-700 hover:border-yellow-500 rounded-full'>Staff List</button>
+							{/* <div>
+								<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
+								<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
+								<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
+								<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
+								<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
+								<Avatar className="mr-2" size={64} icon={<UserOutlined />} />
+							</div> */}
+							{/* <ListStaff/> */}
+							<div>
+								
+							</div>
+						</div>
+						</div>
 					<div className="mb-24 ml-[340px]">
 						<span className="text-xl">Comments</span>
-						<div className="">
-							<Comment
-								author={<a>Han Solo</a>}
-								className="mt-4"
-								avatar={
-									<Avatar
-										src="https://joeschmoe.io/api/v1/random"
-										alt="Han Solo"
-									/>
-								}
-								content={
-									<p>
-										We supply a series of design principles, practical patterns
-										and high quality design resources (Sketch and Axure), to
-										help people create their product prototypes beautifully and
-										efficiently.
-									</p>
-								}
-								datetime={
-									<div className="flex items-start relative">
-										<Tooltip title="2016-11-22 11:22:33" className="mr-2">
-											<span>8 hours ago</span>
-										</Tooltip>
-										<Rate
+							{/* <div className=''>
+								const Editor = ({ onChange, onSubmit, submitting, value }) => (
+									<>
+										<Form.Item>
+										<TextArea rows={4} onChange={onChange} value={value} />
+										</Form.Item>
+										<Form.Item>
+										<Button htmlType="submit" loading={submitting} onClick={onSubmit} type="primary">
+											Add Comment
+										</Button>
+										</Form.Item>
+									</>
+								);
+							</div> */}
+							<div className=''>
+								{comments && comments.length > 0 ? (
+									comments.map((comment) => (
+									<Comment
+										key={comment.email}
+										author={<a>{comment.nickname}</a>}
+										className="mt-4"
+										// avatar={
+										// <Avatar
+										// 	src={comment.avatar}
+										// 	alt={comment.nickname}
+										// />
+										// }
+										avatar={<Avatar src="https://joeschmoe.io/api/v1/random" alt={comment.nickname} />}
+										content={<p>{comment.content}</p>}
+										datetime={
+										<div className="flex items-start relative">
+											<Tooltip title={comment.createdAt} className="mr-2">
+											<span>{comment.createdAt}</span>
+											</Tooltip>
+											{/* Assuming you have a 'rating' property in the comment object */}
+											<Rate
 											disabled
-											defaultValue={5}
+											defaultValue={comment.rating}
 											className="absolute left-20 -bottom-1"
-										/>
-									</div>
-								}
-							/>
-							<Comment
-								author={<a>Solo kill</a>}
-								className="mt-4"
-								avatar={
-									<Avatar
-										src="https://joeschmoe.io/api/v1/random"
-										alt="Han Solo"
+											/>
+										</div>
+										}
 									/>
-								}
-								content={
-									<p>
-										(Sketch and Axure), to help people create their product
-										prototypes beautifully and efficiently.
-									</p>
-								}
-								datetime={
-									<div className="flex items-start relative">
-										<Tooltip title="2016-11-22 11:22:33" className="mr-2">
-											<span>8 hours ago</span>
-										</Tooltip>
-										<Rate
-											disabled
-											defaultValue={4}
-											className="absolute left-20 -bottom-1"
-										/>
-									</div>
-								}
-							/>
-							<Comment
-								author={<a>Mimi</a>}
-								className="mt-4"
-								avatar={
-									<Avatar
-										src="https://joeschmoe.io/api/v1/random"
-										alt="Han Solo"
-									/>
-								}
-								content={
-									<p>
-										We their product prototypes beautifully and efficiently.
-									</p>
-								}
-								datetime={
-									<div className="flex items-start relative">
-										<Tooltip title="2016-11-22 11:22:33" className="mr-2">
-											<span>8 hours ago</span>
-										</Tooltip>
-										<Rate
-											disabled
-											defaultValue={3}
-											className="absolute left-20 -bottom-1"
-										/>
-									</div>
-								}
-							/>
-						</div>
+									))
+								) : (
+									<p>No comments available.</p>
+								)}
+							</div>
 					</div>
 				</div>
 			) : (
