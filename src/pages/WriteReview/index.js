@@ -6,7 +6,7 @@ const WriteReview = () => {
 	const { places } = useSearchPlaces();
 	return (
 		<MainLayout>
-			<CreateReview/>
+			<CreateReview />
 		</MainLayout>
 	);
 };

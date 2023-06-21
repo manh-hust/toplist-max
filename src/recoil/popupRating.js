@@ -1,6 +1,6 @@
-import { atom } from "recoil";
+import { atom } from 'recoil';
 
-const popupRatingState = atom ({
-    key:'popupRatingState',
-    default: false,
+const popupRatingState = atom({
+	key: 'popupRatingState',
+	default: false,
 });

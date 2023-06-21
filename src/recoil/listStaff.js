@@ -1,8 +1,8 @@
-import { atom } from "recoil";
+import { atom } from 'recoil';
 
 const staffListState = atom({
-    key: 'StaffList',
-    default: [],
+	key: 'StaffList',
+	default: [],
 });
 
 export default staffListState;

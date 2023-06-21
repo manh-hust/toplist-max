@@ -1,16 +1,12 @@
-import React from 'react'
-import { Form } from 'react-router-dom'
+import React from 'react';
+import { Form } from 'react-router-dom';
 import { LANGUAGE_LOGO } from '../../constants/languageLogo';
 import { useState } from 'react';
 import { useForm } from 'antd/es/form/Form';
 
 const CreateReview = () => {
-    
-    
-    return 
-    <div>
+	return;
+	<div></div>;
+};
 
-    </div>
-}
-
-export default CreateReview
+export default CreateReview;
