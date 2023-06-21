@@ -6,15 +6,55 @@ import { useParams } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import { LANGUAGE_LOGO } from '../../constants/languageLogo';
 import MainLayout from '../../layouts/MainLayout';
+import { Space, Modal, Checkbox } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { selectedMassagePlaceState } from '../../recoil/Report';
+import {useSetRecoilState, useRecoilValue} from 'recoil'
+import axios from 'axios';
 const { Meta } = Card;
 
 const DetailPlace = () => {
 	const { slug } = useParams();
 	const [place, setPlace] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [reasons, setReasons] = useState([]); // Declare and initialize reasons state variable
+	const [comment, setComment] = useState('');  
+	const setSelectedMassagePlace = useSetRecoilState(selectedMassagePlaceState);
+	setSelectedMassagePlace(slug);
+	const selectedMassagePlace = useRecoilValue(selectedMassagePlaceState);
+	const handleCheckboxChange = (checkedValues) => {
+		setReasons(checkedValues);
+	};
+	const handleReportClick = () => {
+		setIsModalVisible(true);
+	};
+	const handleModalOk = async(values) => {
+		try {
+			const response = await axios.post(
+			  `https://toplist-max-api-production.up.railway.app/api/massage-places/${selectedMassagePlace}/reports`,
+			  values
+			);
+			// Handle success
+			// message.success('Rate successfully');
+			setIsModalVisible(false);
+		  } catch (error) {
+			// Handle error
+			// message.error('Failed to rate');
+		  }
+		setReasons([]);
+		setComment('');
+		// Handle submitting the report
+	};
+	
+	  const handleModalCancel = () => {
+		setIsModalVisible(false);
+		setReasons([]);
+		setComment('');
+	};
 
 	useEffect(() => {
-		const fetchPlace = async () => {
+		const fetchPlace = async() => {
 			try {
 				const response = await axiosClient.get(`/massage-places/${slug}`);
 				setPlace(response.data);
@@ -89,9 +129,14 @@ const DetailPlace = () => {
 									))}
 								</Avatar.Group>
 							</div>
-							<Button type="primary mb-12" ghost>
-								More infomation
-							</Button>
+							<Space direction="horizontal">
+  								<Button type="primary" icon={<ExclamationCircleOutlined />} size="large" style={{ backgroundColor: 'yellow' , color: 'black'}} onClick={handleReportClick}>
+   										 Report
+ 								 </Button>
+  								<Button type="primary" ghost>
+   									 More information
+ 								 </Button>
+							</Space>
 							<div className="flex items-center">
 								<span className="text-xl mr-4">Staff list</span>
 								<div>
@@ -199,6 +244,48 @@ const DetailPlace = () => {
 			) : (
 				<Empty />
 			)}
+			 <Modal
+				title={ <div className="flex justify-center">
+					<div className="bg-yellow-500 text-white px-4 py-2 rounded-full" style={{ width: 'fit-content' }}>
+					<ExclamationCircleOutlined className="mr-2" />
+						Report Place
+					</div>
+				</div>
+				}
+				visible={isModalVisible}
+				onOk={handleModalOk}
+				onCancel={handleModalCancel}
+				footer={[
+					<div className="flex justify-center" key="submit">
+					<Button
+					  type="primary"
+					  size="large"
+					  style={{ backgroundColor: 'yellow', color: 'black' }}
+					  onClick={handleModalOk}
+					>
+					  Submit
+					</Button>
+				  </div>
+				]}
+			>
+				<div>
+				<p>Reason:</p>
+				<div className="mb-4">
+					<Checkbox.Group
+					options={['Wrong Information', 'Something Else']}
+					value={reasons}
+					onChange={handleCheckboxChange}
+					/>
+				</div>
+				<p>Write detail</p>
+				<Input.TextArea
+					rows={4}
+					placeholder="Additional comments (optional)"
+					value={comment}
+					onChange={(e) => setComment(e.target.value)}
+				/>
+				</div>
+  			</Modal>
 		</MainLayout>
 	);
 };
