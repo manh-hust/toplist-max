@@ -13,6 +13,7 @@ import {
 	Tooltip,
 	message,
 } from 'antd';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
@@ -21,7 +22,6 @@ import { LANGUAGE_LOGO } from '../../constants/languageLogo';
 import MainLayout from '../../layouts/MainLayout';
 import { selectedMassagePlaceState } from '../../recoil/apiState';
 import Rating from './Rating';
-
 const { Meta } = Card;
 
 const DetailPlace = () => {
@@ -239,9 +239,12 @@ const DetailPlace = () => {
 										datetime={
 											<div className="flex items-start relative">
 												<Tooltip title={comment.createdAt} className="mr-2">
-													<span>{comment.createdAt}</span>
+													<span>
+														{dayjs(comment.createdAt)
+															.add(7, 'hours')
+															.format('YYYY-MM-DD HH:mm:ss')}
+													</span>
 												</Tooltip>
-												{/* Assuming you have a 'rating' property in the comment object */}
 												<Rate
 													disabled
 													defaultValue={comment.rating}
