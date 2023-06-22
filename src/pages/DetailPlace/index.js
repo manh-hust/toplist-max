@@ -1,6 +1,18 @@
 import Comment from '@ant-design/compatible/lib/comment';
 import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Empty, Input, Modal, Rate, Tooltip } from 'antd';
+import {
+	Avatar,
+	Button,
+	Card,
+	Checkbox,
+	Empty,
+	Form,
+	Input,
+	Modal,
+	Rate,
+	Tooltip,
+	message,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
@@ -13,6 +25,7 @@ import Rating from './Rating';
 const { Meta } = Card;
 
 const DetailPlace = () => {
+	const [form] = Form.useForm();
 	const { slug } = useParams();
 	const [place, setPlace] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -24,6 +37,10 @@ const DetailPlace = () => {
 
 	const [selectedStaff, setSelectedStaff] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [isModalReportVisible, setIsModalReportVisible] = useState(false);
+
+	const [messageApi, contextHolder] = message.useMessage();
+
 	const handleIconClik = (staff) => {
 		setSelectedStaff(staff);
 		setModalVisible(true);
@@ -75,8 +92,38 @@ const DetailPlace = () => {
 		}
 	}, [place, slug]);
 
+	const handleModalOk = () => {
+		setIsModalReportVisible(false);
+	};
+
+	const handleModalCancel = () => {
+		setIsModalReportVisible(false);
+		form.resetFields();
+	};
+
+	const handleSendReport = async (value) => {
+		try {
+			const response = await axiosClient.post(
+				`/massage-places/${slug}/reports`,
+				value
+			);
+			messageApi.open({
+				type: 'success',
+				content: 'Report successfully',
+			});
+			handleModalCancel();
+		} catch (error) {
+			console.log(error.response.data.error[0]);
+			messageApi.open({
+				type: 'error',
+				content: error.response.data.error[0],
+			});
+		}
+	};
+
 	return (
 		<MainLayout>
+			{contextHolder}
 			{!loading ? (
 				<div>
 					<div className="mt-16 flex w-full justify-center">
@@ -142,9 +189,14 @@ const DetailPlace = () => {
 								More infomation
 							</Button>
 						</div>
-						<div className="mt-2 w-3/3">
+						<div className="ml-8 mt-2 w-3/3">
 							<div className="mb-12 flex items-center">
-								<button className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 border-b-4 border-yellow-700 hover:border-yellow-500 rounded-full">
+								<button
+									className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 border-b-4 border-yellow-700 hover:border-yellow-500 rounded-full"
+									onClick={() => {
+										setIsModalReportVisible(true);
+									}}
+								>
 									Report
 								</button>
 							</div>
@@ -205,6 +257,7 @@ const DetailPlace = () => {
 						</div>
 						<Rating setNewComment={setNewComment} />
 					</div>
+					{/* Comment */}
 					<Modal
 						visible={modalVisible}
 						onCancel={() => setModalVisible(false)}
@@ -285,6 +338,55 @@ const DetailPlace = () => {
 								<p>{selectedStaff.position}</p>
 							</div>
 						)}
+					</Modal>
+					{/* Report */}
+					<Modal
+						title={
+							<div className="flex justify-center">
+								<div className="bg-yellow-500 text-white px-4 py-2 rounded-full mb-4">
+									Report Place
+								</div>
+							</div>
+						}
+						visible={isModalReportVisible}
+						onOk={handleModalOk}
+						onCancel={handleModalCancel}
+						footer={null}
+					>
+						<Form form={form} onFinish={handleSendReport}>
+							<Form.Item
+								label="Nickname"
+								name="nickname"
+								rules={[{ required: true }]}
+							>
+								<Input placeholder="Nickname" />
+							</Form.Item>
+							<Form.Item label="Reason" name="reasons">
+								<Checkbox.Group
+									options={['Wrong Information', 'Something Else']}
+								/>
+							</Form.Item>
+							<Form.Item
+								label="Write detail"
+								name="content"
+								rules={[{ required: true }]}
+							>
+								<Input.TextArea
+									rows={4}
+									placeholder="Additional comments (optional)"
+								/>
+							</Form.Item>
+							<Form.Item className="flex justify-center">
+								<Button
+									type="primary"
+									size="large"
+									className="rounded-lg mt-8 bg-yellow-500 text-black hover:bg-yellow-400"
+									htmlType="submit"
+								>
+									Submit
+								</Button>
+							</Form.Item>
+						</Form>
 					</Modal>
 				</div>
 			) : (
