@@ -14,6 +14,8 @@ import {
 	message,
 } from 'antd';
 import dayjs from 'dayjs';
+import { AiFillHeart } from 'react-icons/ai';
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
@@ -21,8 +23,10 @@ import axiosClient from '../../api/axiosClient';
 import { LANGUAGE_LOGO } from '../../constants/languageLogo';
 import MainLayout from '../../layouts/MainLayout';
 import { selectedMassagePlaceState } from '../../recoil/apiState';
-import Rating from './Rating';
+import CommentModal from './CommentModal';
+import RatingModal from './RatingModal';
 const { Meta } = Card;
+const { TextArea } = Input;
 
 const DetailPlace = () => {
 	const [form] = Form.useForm();
@@ -30,8 +34,10 @@ const DetailPlace = () => {
 	const [place, setPlace] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [comments, setComments] = useState([]);
+	const [ratings, setRatings] = useState([]);
 	const [staffs, setStaffs] = useState([]);
 	const [newComment, setNewComment] = useState(true);
+	const [newRating, setNewRating] = useState(true);
 	const setSelectedMassagePlace = useSetRecoilState(selectedMassagePlaceState);
 	setSelectedMassagePlace(slug);
 
@@ -74,6 +80,28 @@ const DetailPlace = () => {
 			fetchComments();
 		}
 	}, [place, slug, newComment]);
+
+	useEffect(() => {
+		const fetchRatings = async () => {
+			try {
+				const response = await axiosClient.get(
+					`/massage-places/${slug}/ratings`
+				);
+				console.log(
+					'🚀 ~ file: index.js:90 ~ fetchRatings ~ response:',
+					response.data
+				);
+
+				setRatings(response.data);
+				setLoading(false);
+			} catch (error) {
+				console.error(error);
+			}
+		};
+		if (place) {
+			fetchRatings();
+		}
+	}, [place, slug, newRating]);
 
 	useEffect(() => {
 		const fetchStaffs = async () => {
@@ -126,7 +154,7 @@ const DetailPlace = () => {
 			{contextHolder}
 			{!loading ? (
 				<div>
-					<div className="mt-16 flex w-full justify-center">
+					<div className="mt-16 flex w-full justify-center mb-12">
 						<div className=" mr-24">
 							<Card
 								className="mx-6 my-4 relative"
@@ -141,7 +169,12 @@ const DetailPlace = () => {
 								}
 							>
 								<Meta title={place.name} description={place.address} />
-								<Rate className="mt-12" disabled defaultValue={place.rate} />
+								<Rate
+									className="mt-12 text-red-500"
+									disabled
+									defaultValue={place.rate}
+									character={<AiFillHeart />}
+								/>
 							</Card>
 						</div>
 						<div className="mt-2 w-1/3">
@@ -185,10 +218,31 @@ const DetailPlace = () => {
 									))}
 								</Avatar.Group>
 							</div>
-							<Button type="primary mb-12" ghost>
-								More infomation
-							</Button>
+							<div className="mb-12 flex items-start flex-col">
+								<span className="text-xl mr-4 mb-4">More information</span>
+								<TextArea
+									type="primary mb-12"
+									placeholder={place.reviewContent}
+									disabled
+									autoSize={{ minRows: 5 }}
+								/>
+							</div>
+							<div className="flex flex-col">
+								<span className="text-xl mr-4 mb-4">Staff List</span>
+								<div className="flex items-center">
+									{staffs.map((staff) => (
+										<Avatar
+											key={staff.id}
+											className="mr-2 cursor-pointer"
+											size={64}
+											src={staff.image}
+											onClick={() => handleIconClik(staff)}
+										/>
+									))}
+								</div>
+							</div>
 						</div>
+						{/* Report button */}
 						<div className="ml-8 mt-2 w-3/3">
 							<div className="mb-12 flex items-center">
 								<button
@@ -202,25 +256,52 @@ const DetailPlace = () => {
 							</div>
 						</div>
 					</div>
-					<div className="flex w-full justify-center mb-10">
-						<div className="flex items-center">
-							<button className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 border-b-4 border-yellow-700 hover:border-yellow-500 rounded-full mr-4">
-								Staff List
-							</button>
-							<div className="flex items-center">
-								{staffs.map((staff) => (
-									<Avatar
-										key={staff.id}
-										className="mr-2 cursor-pointer"
-										size={64}
-										src={staff.image}
-										onClick={() => handleIconClik(staff)}
+
+					{/* List rating */}
+					<div className="mb-24 ml-[280px]">
+						<span className="text-xl">Ratings</span>
+						<div className="">
+							{ratings && ratings.length > 0 ? (
+								ratings.map((comment) => (
+									<Comment
+										key={comment.index}
+										author={<a>{comment.nickname}</a>}
+										className="mt-4"
+										avatar={
+											<Avatar
+												src="https://joeschmoe.io/api/v1/random"
+												alt={comment.nickname}
+											/>
+										}
+										content={<p>{comment.content}</p>}
+										datetime={
+											<div className="flex items-start relative">
+												<Tooltip title={comment.createdAt} className="mr-2">
+													<span>
+														{dayjs(comment.createdAt)
+															.add(7, 'hours')
+															.format('YYYY-MM-DD HH:mm:ss')}
+													</span>
+												</Tooltip>
+												<Rate
+													disabled
+													character={<AiFillHeart />}
+													value={comment.point}
+													className="absolute left-32 -bottom-1 text-red-500"
+												/>
+											</div>
+										}
 									/>
-								))}
-							</div>
+								))
+							) : (
+								<p>No ratings available.</p>
+							)}
 						</div>
+						<RatingModal setNewRating={setNewRating} />
 					</div>
-					<div className="mb-24 ml-[340px]">
+
+					{/* List comment */}
+					<div className="mb-24 ml-[280px]">
 						<span className="text-xl">Comments</span>
 						<div className="">
 							{comments && comments.length > 0 ? (
@@ -245,11 +326,6 @@ const DetailPlace = () => {
 															.format('YYYY-MM-DD HH:mm:ss')}
 													</span>
 												</Tooltip>
-												<Rate
-													disabled
-													defaultValue={comment.rating}
-													className="absolute left-32 -bottom-1"
-												/>
 											</div>
 										}
 									/>
@@ -258,9 +334,10 @@ const DetailPlace = () => {
 								<p>No comments available.</p>
 							)}
 						</div>
-						<Rating setNewComment={setNewComment} />
+						<CommentModal setNewComment={setNewComment} />
 					</div>
-					{/* Comment */}
+
+					{/* Staff modal*/}
 					<Modal
 						visible={modalVisible}
 						onCancel={() => setModalVisible(false)}
@@ -342,7 +419,7 @@ const DetailPlace = () => {
 							</div>
 						)}
 					</Modal>
-					{/* Report */}
+					{/* Report modal*/}
 					<Modal
 						title={
 							<div className="flex justify-center">
