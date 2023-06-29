@@ -5,6 +5,7 @@ import { BsTranslate } from 'react-icons/bs';
 import { GrMap } from 'react-icons/gr';
 import { useSetRecoilState } from 'recoil';
 import axiosClient from '../../api/axiosClient';
+import { LANGUAGE_LOGO } from '../../constants/languageLogo';
 import useSearchPlaces from '../../hooks/useSearchPlaces';
 import placeListState from '../../recoil/listPlace';
 import popupSearchState from '../../recoil/popupSearch';
@@ -15,6 +16,11 @@ const Search = () => {
 		language: '',
 		address: '',
 	});
+
+	const options = Object.keys(LANGUAGE_LOGO).map((key) => ({
+		value: key,
+		label: key,
+	}));
 
 	const setPlaces = useSetRecoilState(placeListState);
 	const setPopupSearch = useSetRecoilState(popupSearchState);
@@ -31,7 +37,6 @@ const Search = () => {
 			console.log(err);
 		}
 	};
-
 	return (
 		<div className="mt-4 h-[720px] border-l-2">
 			<div className="mx-4 flex justify-between items-center">
@@ -72,32 +77,7 @@ const Search = () => {
 								.toLowerCase()
 								.localeCompare((optionB?.label ?? '').toLowerCase())
 						}
-						options={[
-							{
-								value: '',
-								label: 'All',
-							},
-							{
-								value: 'Japanses',
-								label: 'Japanses',
-							},
-							{
-								value: 'Vietnamese',
-								label: 'Vietnamese',
-							},
-							{
-								value: 'English',
-								label: 'English',
-							},
-							{
-								value: 'Venezuela',
-								label: 'Venezuela',
-							},
-							{
-								value: 'Mauritania',
-								label: 'Mauritania',
-							},
-						]}
+						options={options}
 						onChange={(value) => {
 							setFilters({ ...filters, language: value });
 							handleSearchPlaces({ ...filters, language: value });

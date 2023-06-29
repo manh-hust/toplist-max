@@ -1,10 +1,10 @@
-import { Button, Form, Input, Modal, message } from 'antd';
-import axios from 'axios';
+import { Button, Form, Input, Modal, Rate, message } from 'antd';
 import React, { useState } from 'react';
+import { AiFillHeart } from 'react-icons/ai';
 import { useRecoilValue } from 'recoil';
+import axiosClient from '../../api/axiosClient';
 import { selectedMassagePlaceState } from '../../recoil/apiState';
-
-const Rating = ({ setNewComment }) => {
+const RatingModal = ({ setNewRating }) => {
 	const selectedMassagePlace = useRecoilValue(selectedMassagePlaceState);
 	const [visible, setVisible] = useState(false);
 	const [form] = Form.useForm();
@@ -19,15 +19,18 @@ const Rating = ({ setNewComment }) => {
 
 	const handleSubmit = async (values) => {
 		try {
-			const response = await axios.post(
-				`https://toplist-max-api-production.up.railway.app/api/massage-places/${selectedMassagePlace}/comments`,
+			const response = await axiosClient.post(
+				`/massage-places/${selectedMassagePlace}/ratings`,
 				values
 			);
-			message.success('Comment successfully');
-			setNewComment((prev) => !prev);
+
+			message.success('Rating successfully');
+			setNewRating((prev) => !prev);
 			setVisible(false);
+			form.resetFields();
 		} catch (error) {
 			message.error('Failed to comment');
+			form.resetFields();
 		}
 	};
 
@@ -38,7 +41,7 @@ const Rating = ({ setNewComment }) => {
 				onClick={showModal}
 				className="rounded-lg mt-8 bg-yellow-500 text-black hover:bg-yellow-400"
 			>
-				Comment
+				Rating
 			</Button>
 			<Modal
 				title="Comment"
@@ -53,15 +56,27 @@ const Rating = ({ setNewComment }) => {
 						rules={[
 							{
 								required: true,
-								message: 'Please enter your display name: ',
+								message: 'Please enter your display name',
 							},
 						]}
 					>
 						<Input />
 					</Form.Item>
 					<Form.Item
+						name="point"
+						label="Rating: "
+						rules={[
+							{
+								required: true,
+								message: 'Please enter your rating',
+							},
+						]}
+					>
+						<Rate character={<AiFillHeart />} className="ml-10 text-red-500" />
+					</Form.Item>
+					<Form.Item
 						name="content"
-						label="Write your comment here:"
+						label="Write your feeling here:"
 						rules={[
 							{
 								required: true,
@@ -82,4 +97,4 @@ const Rating = ({ setNewComment }) => {
 	);
 };
 
-export default Rating;
+export default RatingModal;

@@ -12,7 +12,7 @@ const ListPlace = ({ places }) => {
 	return (
 		<div className="flex mt-12 mb-12">
 			<div
-				className={`flex h-auto flex-wrap justify-center ${
+				className={`flex h-auto flex-wrap justify-start ml-6 ${
 					popupState && 'w-2/3'
 				}`}
 			>
