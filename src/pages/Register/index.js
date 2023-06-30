@@ -15,6 +15,7 @@ import {
 import { useState } from 'react';
 import axiosClient from '../../api/axiosClient';
 import { LANGUAGE_LOGO } from '../../constants/languageLogo';
+import { uploadImage } from '../../firebase';
 import MainLayout from '../../layouts/MainLayout';
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
@@ -29,6 +30,7 @@ const Register = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const handleSubmit = async (value) => {
 		try {
+			console.log(staffs);
 			if (staffs.length === 0) {
 				messageApi.open({
 					type: 'warning',
@@ -36,9 +38,14 @@ const Register = () => {
 				});
 				return;
 			}
+			console.log(
+				'🚀 ~ file: index.js ~ line 100 ~ handleSubmit ~ value',
+				value
+			);
+			return;
 			const data = {
 				...value,
-				photoUrl: 'https://i.imgur.com/3g7nmJC.png',
+				// photoUrl: 'https://i.imgur.com/3g7nmJC.png',
 				staffs,
 			};
 			setIsLoading(true);
@@ -90,6 +97,7 @@ const Register = () => {
 						layout="horizontal"
 						className="mt-12 w-3/5"
 						form={form1}
+						onFinish={handleSubmit}
 					>
 						<div className="flex justify-center">
 							<div className="w-2/3">
@@ -141,7 +149,18 @@ const Register = () => {
 							</div>
 							<div className="w-1/3">
 								<Form.Item label="Upload" name="photoUrl">
-									<Upload listType="picture-card" multiple={false} maxCount={1}>
+									<Upload
+										listType="picture-card"
+										multiple={false}
+										maxCount={1}
+										onChange={async (e) => {
+											await uploadImage(e);
+											console.log(e);
+											form1.setFieldsValue({
+												photoUrl: e.photoUrl,
+											});
+										}}
+									>
 										<div>
 											<PlusOutlined />
 											<div style={{ marginTop: 8 }}>Upload</div>
@@ -193,21 +212,36 @@ const Register = () => {
 													<Form.Item
 														label="Staff name"
 														name={[index, 'name']}
-														rules={[{ required: true }]}
+														rules={[
+															{
+																required: true,
+																message: 'Please input staff name!',
+															},
+														]}
 													>
 														<Input />
 													</Form.Item>
 													<Form.Item
 														label="Age"
 														name={[index, 'age']}
-														rules={[{ required: true }]}
+														rules={[
+															{
+																required: true,
+																message: 'Please input age!',
+															},
+														]}
 													>
 														<InputNumber min={18} />
 													</Form.Item>
 													<Form.Item
 														label="Year of EXP"
 														name={[index, 'experience']}
-														rules={[{ required: true }]}
+														rules={[
+															{
+																required: true,
+																message: 'Please input year of EXP!',
+															},
+														]}
 													>
 														<InputNumber min={0} />
 													</Form.Item>
@@ -225,7 +259,7 @@ const Register = () => {
 															</div>
 														</Upload>
 													</Form.Item>
-													{fields.length > 1 ? (
+													{fields.length > 0 ? (
 														<Button
 															type="danger"
 															onClick={() => remove(field.name)}
