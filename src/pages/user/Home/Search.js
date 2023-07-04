@@ -4,11 +4,11 @@ import { AiFillStar, AiOutlineClose } from 'react-icons/ai';
 import { BsTranslate } from 'react-icons/bs';
 import { GrMap } from 'react-icons/gr';
 import { useSetRecoilState } from 'recoil';
-import axiosClient from '../../api/axiosClient';
-import { LANGUAGE_LOGO } from '../../constants/languageLogo';
-import useSearchPlaces from '../../hooks/useSearchPlaces';
-import placeListState from '../../recoil/listPlace';
-import popupSearchState from '../../recoil/popupSearch';
+import axiosClient from '../../../api/axiosClient';
+import { LANGUAGE_LOGO } from '../../../constants/languageLogo';
+import useSearchPlaces from '../../../hooks/useSearchPlaces';
+import placeListState from '../../../recoil/listPlace';
+import popupSearchState from '../../../recoil/popupSearch';
 
 const Search = () => {
 	const [filters, setFilters] = React.useState({

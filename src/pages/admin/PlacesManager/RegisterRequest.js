@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import axiosClient from '../../../api/axiosClient';
 import { getStatus } from '../../../constants/commons';
 import AdminLayout from '../../../layouts/AdminLayout';
-import SideBar from './SideBar';
 
 const RegisterRequest = () => {
 	const [places, setPlaces] = useState([]);
@@ -93,7 +92,7 @@ const RegisterRequest = () => {
 				return;
 			}
 			setIsLoading(true);
-			const response = await axiosClient.post('/massage-places/approve', {
+			const response = await axiosClient.post('/admin/massage-places/approve', {
 				id,
 			});
 			if (response.success) {
@@ -134,7 +133,7 @@ const RegisterRequest = () => {
 				return;
 			}
 			setIsLoading(true);
-			const response = await axiosClient.post('/massage-places/reject', {
+			const response = await axiosClient.post('/admin/massage-places/reject', {
 				id,
 			});
 			if (response.success) {
@@ -159,15 +158,15 @@ const RegisterRequest = () => {
 		setId(null);
 		setShowModalReject(false);
 	};
-
 	const handleOkReject = () => {
 		handleReject();
 		setId(null);
 		setShowModalReject(false);
 	};
+
 	useEffect(() => {
 		const fetchPlaces = async () => {
-			const response = await axiosClient.get('/massage-places/request');
+			const response = await axiosClient.get('/admin/massage-places/request');
 			const data = response.data.map((place) => ({
 				key: place.id,
 				name: place.name,
@@ -183,15 +182,12 @@ const RegisterRequest = () => {
 	return (
 		<AdminLayout>
 			{contextHolder}
-			<div className="flex min-h-screen mt-12">
-				<SideBar />
-				<div className="flex-1 flex justify-center">
-					<Table
-						columns={columns}
-						dataSource={places || []}
-						className="min-w-[1300px]"
-					/>
-				</div>
+			<div className="flex-1 flex justify-center">
+				<Table
+					columns={columns}
+					dataSource={places || []}
+					className="min-w-[1300px]"
+				/>
 			</div>
 			{/* Modal approve */}
 			<Modal
