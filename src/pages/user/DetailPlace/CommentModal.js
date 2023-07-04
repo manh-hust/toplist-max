@@ -1,10 +1,10 @@
-import { Button, Form, Input, Modal, Rate, message } from 'antd';
+import { Button, Form, Input, Modal, message } from 'antd';
 import React, { useState } from 'react';
-import { AiFillHeart } from 'react-icons/ai';
 import { useRecoilValue } from 'recoil';
-import axiosClient from '../../api/axiosClient';
-import { selectedMassagePlaceState } from '../../recoil/apiState';
-const RatingModal = ({ setNewRating }) => {
+import axiosClient from '../../../api/axiosClient';
+import { selectedMassagePlaceState } from '../../../recoil/apiState';
+
+const CommentModal = ({ setNewComment }) => {
 	const selectedMassagePlace = useRecoilValue(selectedMassagePlaceState);
 	const [visible, setVisible] = useState(false);
 	const [form] = Form.useForm();
@@ -20,12 +20,12 @@ const RatingModal = ({ setNewRating }) => {
 	const handleSubmit = async (values) => {
 		try {
 			const response = await axiosClient.post(
-				`/massage-places/${selectedMassagePlace}/ratings`,
+				`/massage-places/${selectedMassagePlace}/comments`,
 				values
 			);
 
-			message.success('Rating successfully');
-			setNewRating((prev) => !prev);
+			message.success('Comment successfully');
+			setNewComment((prev) => !prev);
 			setVisible(false);
 			form.resetFields();
 		} catch (error) {
@@ -41,7 +41,7 @@ const RatingModal = ({ setNewRating }) => {
 				onClick={showModal}
 				className="rounded-lg mt-8 bg-yellow-500 text-black hover:bg-yellow-400"
 			>
-				Rating
+				Comment
 			</Button>
 			<Modal
 				title="Comment"
@@ -56,22 +56,15 @@ const RatingModal = ({ setNewRating }) => {
 						rules={[
 							{
 								required: true,
-								message: 'Please enter your display name',
+								message: 'Please enter your display name: ',
 							},
 						]}
 					>
 						<Input />
 					</Form.Item>
-					<Form.Item name="point" label="Rating: ">
-						<Rate
-							character={<AiFillHeart />}
-							className="ml-10 text-red-500"
-							defaultValue={0}
-						/>
-					</Form.Item>
 					<Form.Item
 						name="content"
-						label="Write your feeling here:"
+						label="Write your comment here:"
 						rules={[
 							{
 								required: true,
@@ -92,4 +85,4 @@ const RatingModal = ({ setNewRating }) => {
 	);
 };
 
-export default RatingModal;
+export default CommentModal;

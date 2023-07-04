@@ -2,8 +2,8 @@ import { Avatar, Card, Empty } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { LANGUAGE_LOGO } from '../../constants/languageLogo';
-import popupSearchState from '../../recoil/popupSearch';
+import { LANGUAGE_LOGO } from '../../../constants/languageLogo';
+import popupSearchState from '../../../recoil/popupSearch';
 import Search from './Search';
 const { Meta } = Card;
 
@@ -26,7 +26,7 @@ const ListPlace = ({ places }) => {
 							<Card
 								className="mx-6 my-4 relative"
 								hoverable
-								style={{ width: 280, height: 450 }}
+								style={{ width: 246, height: 450 }}
 								cover={
 									<img
 										alt="example"

@@ -14,10 +14,10 @@ import {
 } from 'antd';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { useState } from 'react';
-import axiosClient from '../../api/axiosClient';
-import { LANGUAGE_LOGO } from '../../constants/languageLogo';
-import { storage } from '../../firebase';
-import MainLayout from '../../layouts/MainLayout';
+import axiosClient from '../../../api/axiosClient';
+import { LANGUAGE_LOGO } from '../../../constants/languageLogo';
+import { storage } from '../../../firebase';
+import MainLayout from '../../../layouts/MainLayout';
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const listCountry = Object.keys(LANGUAGE_LOGO);
