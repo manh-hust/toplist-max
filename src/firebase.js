@@ -28,23 +28,23 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 export const storage = getStorage(app);
 
-export const uploadImage = async (e) => {
-	try {
-		const file = e.file.originFileObj;
-		const imageRef = ref(storage, `images/${file.name}`);
-		const uploadTask = uploadBytesResumable(imageRef, file);
+// export const uploadImage = async (e) => {
+// 	try {
+// 		const file = e.file.originFileObj;
+// 		const imageRef = ref(storage, `images/${file.name}`);
+// 		const uploadTask = uploadBytesResumable(imageRef, file);
 
-		uploadTask.on(
-			'state_changed',
-			(snapshot) => {},
-			(err) => {},
-			() => {
-				getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-					e = { ...e, url };
-				});
-			}
-		);
-	} catch (error) {
-		console.log('🚀 ~ file: firebase.js:38 ~ handleChangeImg ~ error:', error);
-	}
-};
+// 		uploadTask.on(
+// 			'state_changed',
+// 			(snapshot) => {},
+// 			(err) => {},
+// 			() => {
+// 				getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+// 					e = { ...e, url };
+// 				});
+// 			}
+// 		);
+// 	} catch (error) {
+// 		console.log('🚀 ~ file: firebase.js:38 ~ handleChangeImg ~ error:', error);
+// 	}
+// };

@@ -5,11 +5,11 @@ import {
 	Button,
 	Card,
 	Checkbox,
-	Empty,
 	Form,
 	Input,
 	Modal,
 	Rate,
+	Spin,
 	Tooltip,
 	message,
 } from 'antd';
@@ -149,6 +149,8 @@ const DetailPlace = () => {
 		}
 	};
 
+	console.log(place);
+
 	return (
 		<MainLayout>
 			{contextHolder}
@@ -163,7 +165,11 @@ const DetailPlace = () => {
 								cover={
 									<img
 										alt="example"
-										src="https://cdn.spafinder.com/2015/08/massage.jpg"
+										src={
+											place.photoUrl
+												? place.photoUrl
+												: 'https://cdn.spafinder.com/2015/08/massage.jpg'
+										}
 										className="h-80 w-full object-cover"
 									/>
 								}
@@ -470,7 +476,10 @@ const DetailPlace = () => {
 					</Modal>
 				</div>
 			) : (
-				<Empty />
+				<div className="flex justify-center my-72">
+					{/* <Empty /> */}
+					<Spin />
+				</div>
 			)}
 		</MainLayout>
 	);
