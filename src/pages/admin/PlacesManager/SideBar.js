@@ -1,46 +1,43 @@
-import {
-	AppstoreOutlined,
-	MailOutlined,
-	SettingOutlined,
-} from '@ant-design/icons';
+import { AppstoreOutlined, MailOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { useState } from 'react';
-function getItem(label, key, icon, children, type) {
-	return {
-		key,
-		icon,
-		children,
-		label,
-		type,
-	};
-}
-const items = [
-	getItem('Massage places', 'sub1', <MailOutlined />, [
-		getItem('Active places', '1'),
-		getItem('Request', '2'),
-	]),
-	getItem('Navigation Two', 'sub2', <AppstoreOutlined />, [
-		getItem('Option 5', '5'),
-		getItem('Option 6', '6'),
-	]),
-	getItem('Navigation Three', 'sub4', <SettingOutlined />, [
-		getItem('Option 9', '9'),
-		getItem('Option 10', '10'),
-	]),
-];
+import { Link } from 'react-router-dom';
+
 const SideBar = () => {
 	const [current, setCurrent] = useState('1');
 
 	return (
 		<Menu
-			style={{
-				width: 256,
-			}}
 			defaultOpenKeys={['sub1']}
 			selectedKeys={[current]}
 			mode="inline"
-			items={items}
-		/>
+			className="w-60 px-4"
+			accessKey={current}
+		>
+			<Link to="/admin/places">
+				<Menu.Item
+					key="all-places"
+					icon={<AppstoreOutlined className="px-2" />}
+				>
+					All places
+				</Menu.Item>
+			</Link>
+			<Link to="/admin/places/request">
+				<Menu.Item key="request" icon={<MailOutlined className="px-2" />}>
+					Request
+				</Menu.Item>
+			</Link>
+			<Link to="/admin/report">
+				<Menu.Item key="request" icon={<MailOutlined className="px-2" />}>
+					Reports
+				</Menu.Item>
+			</Link>
+			<Link to="/admin/comment">
+				<Menu.Item key="request" icon={<MailOutlined className="px-2" />}>
+					Comments
+				</Menu.Item>
+			</Link>
+		</Menu>
 	);
 };
 

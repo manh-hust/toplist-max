@@ -62,17 +62,12 @@ const RatingModal = ({ setNewRating }) => {
 					>
 						<Input />
 					</Form.Item>
-					<Form.Item
-						name="point"
-						label="Rating: "
-						rules={[
-							{
-								required: true,
-								message: 'Please enter your rating',
-							},
-						]}
-					>
-						<Rate character={<AiFillHeart />} className="ml-10 text-red-500" />
+					<Form.Item name="point" label="Rating: ">
+						<Rate
+							character={<AiFillHeart />}
+							className="ml-10 text-red-500"
+							defaultValue={0}
+						/>
 					</Form.Item>
 					<Form.Item
 						name="content"

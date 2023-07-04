@@ -12,12 +12,14 @@ const ListPlace = ({ places }) => {
 	return (
 		<div className="flex mt-12 mb-12">
 			<div
-				className={`flex h-auto flex-wrap justify-start ml-6 ${
-					popupState && 'w-2/3'
+				className={`flex h-auto flex-wrap ml-6 ${
+					popupState ? 'w-2/3 justify-start' : 'w-full justify-start'
 				}`}
 			>
 				{!places || places.length <= 0 ? (
-					<Empty className="mt-24" />
+					<div className="flex justify-center w-full mt-24">
+						<Empty />
+					</div>
 				) : (
 					places.map((place) => (
 						<Link to={`/massage-places/${place.id}`}>
@@ -28,7 +30,11 @@ const ListPlace = ({ places }) => {
 								cover={
 									<img
 										alt="example"
-										src="https://cdn.spafinder.com/2015/08/massage.jpg"
+										src={
+											place.photoUrl
+												? place.photoUrl
+												: 'https://cdn.spafinder.com/2015/08/massage.jpg'
+										}
 										className="h-80 w-full object-cover"
 									/>
 								}

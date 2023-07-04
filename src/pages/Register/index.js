@@ -12,9 +12,11 @@ import {
 	Upload,
 	message,
 } from 'antd';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { useState } from 'react';
 import axiosClient from '../../api/axiosClient';
 import { LANGUAGE_LOGO } from '../../constants/languageLogo';
+import { storage } from '../../firebase';
 import MainLayout from '../../layouts/MainLayout';
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
@@ -27,6 +29,9 @@ const Register = () => {
 	const [form2] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 	const [isLoading, setIsLoading] = useState(false);
+
+	const [imageUrl, setImageUrl] = useState('https://i.imgur.com/3g7nmJC.png');
+
 	const handleSubmit = async (value) => {
 		try {
 			if (staffs.length === 0) {
@@ -38,8 +43,7 @@ const Register = () => {
 			}
 			const data = {
 				...value,
-				photoUrl: 'https://i.imgur.com/3g7nmJC.png',
-				staffs,
+				staffs: staffs.staffs,
 			};
 			setIsLoading(true);
 			const response = await axiosClient.post('/massage-places', data);
@@ -48,10 +52,11 @@ const Register = () => {
 					type: 'success',
 					content: 'Register success',
 				});
+				form1.resetFields();
+				form2.resetFields();
+				setStaffs([]);
 			}
 			setIsLoading(false);
-			form1.resetFields();
-			form2.resetFields();
 		} catch (error) {
 			messageApi.open({
 				type: 'error',
@@ -64,8 +69,32 @@ const Register = () => {
 		setIsModalOpen(true);
 	};
 
+	const uploadImage = async (e) => {
+		try {
+			const file = e.file.originFileObj;
+			const imageRef = ref(storage, `images/${file.name}`);
+			const uploadTask = uploadBytesResumable(imageRef, file);
+			uploadTask.on(
+				'state_changed',
+				(snapshot) => {},
+				(err) => {},
+				() => {
+					getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+						setImageUrl(url);
+					});
+				}
+			);
+		} catch (error) {
+			console.log(
+				'🚀 ~ file: firebase.js:38 ~ handleChangeImg ~ error:',
+				error
+			);
+		}
+	};
+
 	const handleOk = () => {
 		setIsModalOpen(false);
+		form2.resetFields();
 	};
 
 	const handleCancel = async () => {
@@ -79,7 +108,7 @@ const Register = () => {
 		<MainLayout>
 			{contextHolder}
 			{isLoading ? (
-				<div>
+				<div className="flex justify-center">
 					<Spin />
 				</div>
 			) : (
@@ -90,6 +119,7 @@ const Register = () => {
 						layout="horizontal"
 						className="mt-12 w-3/5"
 						form={form1}
+						onFinish={handleSubmit}
 					>
 						<div className="flex justify-center">
 							<div className="w-2/3">
@@ -141,7 +171,15 @@ const Register = () => {
 							</div>
 							<div className="w-1/3">
 								<Form.Item label="Upload" name="photoUrl">
-									<Upload listType="picture-card" multiple={false} maxCount={1}>
+									<Upload
+										listType="picture-card"
+										multiple={false}
+										maxCount={1}
+										onChange={async (e) => {
+											await uploadImage(e);
+											form1.setFieldsValue({ photoUrl: imageUrl });
+										}}
+									>
 										<div>
 											<PlusOutlined />
 											<div style={{ marginTop: 8 }}>Upload</div>
@@ -150,14 +188,14 @@ const Register = () => {
 								</Form.Item>
 							</div>
 						</div>
-						<Form.Item className="ml-10">
-							<button
+						<div className="ml-10">
+							<span
 								className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 border-b-4 border-yellow-700 hover:border-yellow-500 rounded-full mr-4 mt-4"
 								onClick={showModal}
 							>
 								Staff List
-							</button>
-						</Form.Item>
+							</span>
+						</div>
 						<Form.Item className="flex justify-center">
 							<Button htmlType="submit" className="w-32 h-12">
 								Submit
@@ -174,13 +212,7 @@ const Register = () => {
 						<Form
 							form={form2}
 							onValuesChange={(changedValues, allValues) => {
-								const staffsFormatImage = allValues.staffs.map((item) => {
-									return {
-										...item,
-										image: 'https://i.imgur.com/3g7nmJC.png',
-									};
-								});
-								setStaffs(staffsFormatImage);
+								setStaffs(allValues);
 							}}
 						>
 							<Form.List name="staffs">
@@ -193,26 +225,53 @@ const Register = () => {
 													<Form.Item
 														label="Staff name"
 														name={[index, 'name']}
-														rules={[{ required: true }]}
+														rules={[
+															{
+																required: true,
+																message: 'Please input staff name!',
+															},
+														]}
 													>
 														<Input />
 													</Form.Item>
 													<Form.Item
 														label="Age"
 														name={[index, 'age']}
-														rules={[{ required: true }]}
+														rules={[
+															{
+																required: true,
+																message: 'Please input age!',
+															},
+														]}
 													>
 														<InputNumber min={18} />
 													</Form.Item>
 													<Form.Item
 														label="Year of EXP"
 														name={[index, 'experience']}
-														rules={[{ required: true }]}
+														rules={[
+															{
+																required: true,
+																message: 'Please input year of EXP!',
+															},
+														]}
 													>
 														<InputNumber min={0} />
 													</Form.Item>
 													<Form.Item label="Upload" name={[index, 'image']}>
-														<Upload listType="picture-card" maxCount={1}>
+														<Upload
+															listType="picture-card"
+															maxCount={1}
+															onChange={async (e) => {
+																await uploadImage(e);
+																const fieldsValue = form2.getFieldsValue();
+																const { staffs } = fieldsValue;
+																await Object.assign(staffs[index], {
+																	image: imageUrl,
+																});
+																form2.setFieldsValue({ staffs });
+															}}
+														>
 															<div>
 																<PlusOutlined />
 																<div
@@ -225,7 +284,7 @@ const Register = () => {
 															</div>
 														</Upload>
 													</Form.Item>
-													{fields.length > 1 ? (
+													{fields.length > 0 ? (
 														<Button
 															type="danger"
 															onClick={() => remove(field.name)}

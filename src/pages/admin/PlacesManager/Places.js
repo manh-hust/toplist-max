@@ -1,8 +1,10 @@
 import { Space, Table, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import axiosClient from '../../../api/axiosClient';
+import { getStatus } from '../../../constants/commons';
 import AdminLayout from '../../../layouts/AdminLayout';
 import SideBar from './SideBar';
+
 const columns = [
 	{
 		title: 'Name',
@@ -44,11 +46,13 @@ const columns = [
 		key: 'action',
 		render: (_, record) => (
 			<Space size="middle">
-				<Tag color="green" className="cursor-pointer">
-					Accept
+				<Tag color="blue" className="cursor-pointer">
+					<a href={`/massage-places/${record.key}`} target="blank">
+						Detail
+					</a>
 				</Tag>
 				<Tag color="red" className="cursor-pointer">
-					Reject
+					Delete
 				</Tag>
 			</Space>
 		),
@@ -60,28 +64,29 @@ const Places = () => {
 
 	useEffect(() => {
 		const fetchPlaces = async () => {
-			const response = await axiosClient.get('/massage-places/request');
-			setPlaces(response.data);
+			const response = await axiosClient.get('/massage-places?limit=100');
+			const data = response.data.massagePlaces.map((place) => ({
+				key: place.id,
+				name: place.name,
+				address: place.address,
+				status: getStatus(place?.status),
+				languages: place.serviceLanguages,
+			}));
+			setPlaces(data);
 		};
 		fetchPlaces();
 	}, []);
 
-	const data = places?.map((place) => ({
-		key: place.id,
-		name: place.name,
-		address: place.address,
-		status: 'Pending',
-		languages: place.serviceLanguages,
-	}));
-
 	return (
 		<AdminLayout>
-			<div className="flex w-screen">
-				<div className="w-1/5">
-					<SideBar />
-				</div>
+			<div className="flex min-h-screen mt-12">
+				<SideBar />
 				<div className="w-full flex justify-center">
-					<Table columns={columns} dataSource={data || []} />
+					<Table
+						columns={columns}
+						dataSource={places || []}
+						className="min-w-[1300px]"
+					/>
 				</div>
 			</div>
 		</AdminLayout>
