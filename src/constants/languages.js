@@ -12,3 +12,5 @@ export const LANGUAGE_LOGO = {
 	Spanish: 'https://cdn.countryflags.com/thumbs/spain/flag-round-250.png',
 	Thai: 'https://cdn.countryflags.com/thumbs/thailand/flag-round-250.png',
 };
+
+export const LANGUAGES = Object.keys(LANGUAGE_LOGO);

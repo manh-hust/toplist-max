@@ -1,7 +1,6 @@
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import {
 	Button,
-	DatePicker,
 	Divider,
 	Form,
 	Input,
@@ -15,12 +14,10 @@ import {
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { useState } from 'react';
 import axiosClient from '../../../api/axiosClient';
-import { LANGUAGE_LOGO } from '../../../constants/languageLogo';
+import { LANGUAGES, LANGUAGE_LOGO } from '../../../constants/languages';
 import { storage } from '../../../firebase';
 import MainLayout from '../../../layouts/MainLayout';
-const { RangePicker } = DatePicker;
 const { TextArea } = Input;
-const listCountry = Object.keys(LANGUAGE_LOGO);
 
 const Register = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,6 +42,8 @@ const Register = () => {
 				...value,
 				staffs: staffs.staffs,
 			};
+			console.log('🚀 ~ file: index.js:45 ~ handleSubmit ~ data:', data);
+			return;
 			setIsLoading(true);
 			const response = await axiosClient.post('/massage-places', data);
 			if (response.success) {
@@ -65,6 +64,7 @@ const Register = () => {
 			setIsLoading(false);
 		}
 	};
+
 	const showModal = () => {
 		setIsModalOpen(true);
 	};
@@ -147,7 +147,7 @@ const Register = () => {
 									]}
 								>
 									<Select mode="multiple">
-										{listCountry.map((item) => (
+										{LANGUAGES.map((item) => (
 											<Select.Option key={item} value={item}>
 												<img
 													src={LANGUAGE_LOGO[item]}
@@ -175,14 +175,23 @@ const Register = () => {
 										listType="picture-card"
 										multiple={false}
 										maxCount={1}
+										className="ml-2"
 										onChange={async (e) => {
 											await uploadImage(e);
+											console.log(
+												'🚀 ~ file: index.js:185 ~ onChange={ ~ imageUrl:',
+												imageUrl
+											);
 											form1.setFieldsValue({ photoUrl: imageUrl });
+											console.log(
+												'🚀 ~ file: index.js:189 ~ onChange={ ~ form1:',
+												form1.getFieldValue('photoUrl')
+											);
 										}}
 									>
 										<div>
 											<PlusOutlined />
-											<div style={{ marginTop: 8 }}>Upload</div>
+											<div className="mt-4">Upload</div>
 										</div>
 									</Upload>
 								</Form.Item>
@@ -197,11 +206,12 @@ const Register = () => {
 							</span>
 						</div>
 						<Form.Item className="flex justify-center">
-							<Button htmlType="submit" className="w-32 h-12">
+							<Button htmlType="submit" className="w-32 h-12 mt-12">
 								Submit
 							</Button>
 						</Form.Item>
 					</Form>
+					{/* Add list staffs */}
 					<Modal
 						title="Add staffs"
 						open={isModalOpen}

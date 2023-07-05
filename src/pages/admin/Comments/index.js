@@ -140,7 +140,7 @@ const Comments = () => {
 			searchedColumn === dataIndex ? (
 				<Highlighter
 					highlightStyle={{
-						backgroundColor: '#ffc069',
+						backgroundColor: '#fff',
 						padding: 0,
 					}}
 					searchWords={[searchText]}
@@ -164,6 +164,7 @@ const Comments = () => {
 			title: 'Content',
 			dataIndex: 'content',
 			key: 'content',
+			...getColumnSearchProps('content'),
 			render: (text) => <span>{text}</span>,
 		},
 		{

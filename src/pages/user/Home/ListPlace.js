@@ -2,7 +2,7 @@ import { Avatar, Card, Empty } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { LANGUAGE_LOGO } from '../../../constants/languageLogo';
+import { LANGUAGE_LOGO } from '../../../constants/languages';
 import popupSearchState from '../../../recoil/popupSearch';
 import Search from './Search';
 const { Meta } = Card;
