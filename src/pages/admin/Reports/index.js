@@ -1,5 +1,7 @@
-import { Modal, Space, Table, Tag, message } from 'antd';
-import { useEffect, useState } from 'react';
+import { SearchOutlined } from '@ant-design/icons';
+import { Button, Input, Modal, Space, Table, Tag, message } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import Highlighter from 'react-highlight-words';
 import axiosClient from '../../../api/axiosClient';
 import AdminLayout from '../../../layouts/AdminLayout';
 
@@ -8,61 +10,9 @@ const Reports = () => {
 	const [isOpenModal, setIsOpenModal] = useState(false);
 	const [messageApi, contextHolder] = message.useMessage();
 	const [id, setId] = useState(null);
-
-	const columns = [
-		{
-			title: 'Nickname',
-			dataIndex: 'nickname',
-			key: 'nickname',
-			render: (text) => <span>{text}</span>,
-		},
-		{
-			title: 'Content',
-			dataIndex: 'content',
-			key: 'content',
-			render: (text) => <span>{text}</span>,
-		},
-		{
-			title: 'Email address',
-			dataIndex: 'email',
-			key: 'email',
-			render: (text) => <span>{text || 'Not update'}</span>,
-		},
-		{
-			title: 'Massage place',
-			dataIndex: 'place',
-			key: 'place',
-			render: (place) => (
-				<a href={`/massage-places/${place?.id}`} target="blank">
-					{place?.name}
-				</a>
-			),
-		},
-		{
-			title: 'Create at',
-			key: 'time',
-			dataIndex: 'time',
-			render: (text) => <span>{text}</span>,
-		},
-		{
-			title: 'Action',
-			key: 'action',
-			render: (_, record) => (
-				<Space size="middle">
-					<Tag
-						color="red"
-						className="cursor-pointer"
-						onClick={() => {
-							setIsOpenModal(true);
-							setId(record.key);
-						}}
-					>
-						Delete
-					</Tag>
-				</Space>
-			),
-		},
-	];
+	const [searchText, setSearchText] = useState('');
+	const [searchedColumn, setSearchedColumn] = useState('');
+	const searchInput = useRef(null);
 
 	const handleOk = async () => {
 		await handleDelete();
@@ -86,6 +36,7 @@ const Reports = () => {
 			messageApi.error('Delete report failed');
 		}
 	};
+
 	useEffect(() => {
 		const fetchReports = async () => {
 			try {
@@ -95,8 +46,9 @@ const Reports = () => {
 					nickname: item.nickname,
 					content: item.content,
 					email: item.email,
-					place: item.place,
+					place: item.place.name,
 					time: item.createdAt,
+					placeId: item.place.id,
 				}));
 				setReports(data);
 			} catch (error) {
@@ -106,6 +58,155 @@ const Reports = () => {
 		fetchReports();
 	}, []);
 
+	const handleSearch = (selectedKeys, confirm, dataIndex) => {
+		confirm();
+		setSearchText(selectedKeys[0]);
+		setSearchedColumn(dataIndex);
+	};
+	const handleReset = (clearFilters) => {
+		clearFilters();
+		setSearchText('');
+	};
+	const getColumnSearchProps = (dataIndex) => ({
+		filterDropdown: ({
+			setSelectedKeys,
+			selectedKeys,
+			confirm,
+			clearFilters,
+			close,
+		}) => (
+			<div
+				style={{
+					padding: 8,
+				}}
+				onKeyDown={(e) => e.stopPropagation()}
+			>
+				<Input
+					ref={searchInput}
+					placeholder={`Search ${dataIndex}`}
+					value={selectedKeys[0]}
+					onChange={(e) =>
+						setSelectedKeys(e.target.value ? [e.target.value] : [])
+					}
+					onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+					style={{
+						marginBottom: 8,
+						display: 'block',
+					}}
+				/>
+				<Space>
+					<Button
+						type="primary"
+						onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+						icon={<SearchOutlined />}
+						size="small"
+						style={{
+							width: 90,
+						}}
+						className="flex items-center bg-blue-500"
+					>
+						Search
+					</Button>
+					<Button
+						onClick={() => {
+							clearFilters && handleReset(clearFilters);
+							handleSearch(selectedKeys, confirm, dataIndex);
+						}}
+						size="small"
+						style={{
+							width: 90,
+						}}
+					>
+						Reset
+					</Button>
+				</Space>
+			</div>
+		),
+		filterIcon: (filtered) => (
+			<SearchOutlined
+				style={{
+					color: filtered ? '#1677ff' : undefined,
+				}}
+			/>
+		),
+		onFilter: (value, record) =>
+			record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+		onFilterDropdownOpenChange: (visible) => {
+			if (visible) {
+				setTimeout(() => searchInput.current?.select(), 100);
+			}
+		},
+		render: (text) =>
+			searchedColumn === dataIndex ? (
+				<Highlighter
+					highlightStyle={{
+						backgroundColor: '#fff',
+						padding: 0,
+					}}
+					searchWords={[searchText]}
+					autoEscape
+					textToHighlight={text ? text.toString() : ''}
+				/>
+			) : (
+				text
+			),
+	});
+
+	const columns = [
+		{
+			title: 'Nickname',
+			dataIndex: 'nickname',
+			key: 'nickname',
+			...getColumnSearchProps('nickname'),
+		},
+		{
+			title: 'Content',
+			dataIndex: 'content',
+			key: 'content',
+			...getColumnSearchProps('content'),
+		},
+		{
+			title: 'Email address',
+			dataIndex: 'email',
+			key: 'email',
+			render: (text) => <span>{text || 'Not update'}</span>,
+		},
+		{
+			title: 'Massage place',
+			dataIndex: 'place',
+			key: 'place',
+			...getColumnSearchProps('place'),
+		},
+		{
+			title: 'Create at',
+			key: 'time',
+			dataIndex: 'time',
+			sorter: (a, b) => a.time.localeCompare(b.time),
+		},
+		{
+			title: 'Action',
+			key: 'action',
+			render: (_, record) => (
+				<Space size="middle">
+					<Tag color="blue" className="cursor-pointer">
+						<a href={`/massage-places/${record.placeId}`} target="blank">
+							Detail
+						</a>
+					</Tag>
+					<Tag
+						color="red"
+						className="cursor-pointer"
+						onClick={() => {
+							setIsOpenModal(true);
+							setId(record.key);
+						}}
+					>
+						Delete
+					</Tag>
+				</Space>
+			),
+		},
+	];
 	return (
 		<AdminLayout>
 			{contextHolder}

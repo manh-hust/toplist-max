@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import axiosClient from '../../../api/axiosClient';
-import { LANGUAGE_LOGO } from '../../../constants/languageLogo';
+import { LANGUAGE_LOGO } from '../../../constants/languages';
 import MainLayout from '../../../layouts/MainLayout';
 import { selectedMassagePlaceState } from '../../../recoil/apiState';
 import CommentModal from './CommentModal';

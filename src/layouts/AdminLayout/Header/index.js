@@ -1,7 +1,24 @@
 import { BsJournalBookmark } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import logo from '../../../assets/images/logo-new.png';
+import isAuthenticated from '../../../recoil/auth';
+import sideBarStatus from '../../../recoil/sideBarStatus';
+import { useSetRecoilState } from 'recoil';
+
 const Header = () => {
+	const [authenticated, setAuthenticated] = useRecoilState(isAuthenticated);
+	const setStatusSidebar = useSetRecoilState(sideBarStatus);
+	const token = localStorage.getItem('token');
+	const navigate = useNavigate();
+
+	const handleLogout = () => {
+		localStorage.removeItem('token');
+		setAuthenticated(false);
+		setStatusSidebar('1');
+		navigate('/admin/login');
+	};
+
 	return (
 		<div className="w-full h-20 bg-yellow-400 flex items-center justify-between px-4 py-4">
 			<div className="flex ml-8 items-center">
@@ -13,6 +30,16 @@ const Header = () => {
 				</div>
 			</div>
 			<div className="flex">
+				{token ? (
+					<h1
+						className="text-xl font-bold mr-8 cursor-pointer"
+						onClick={handleLogout}
+					>
+						Logout
+					</h1>
+				) : (
+					<></>
+				)}
 				<BsJournalBookmark className="w-8 h-8" />
 			</div>
 		</div>
