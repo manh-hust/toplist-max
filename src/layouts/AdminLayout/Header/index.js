@@ -1,10 +1,8 @@
-import { BsJournalBookmark } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import logo from '../../../assets/images/logo-new.png';
 import isAuthenticated from '../../../recoil/auth';
 import sideBarStatus from '../../../recoil/sideBarStatus';
-import { useSetRecoilState } from 'recoil';
 
 const Header = () => {
 	const [authenticated, setAuthenticated] = useRecoilState(isAuthenticated);
@@ -40,7 +38,6 @@ const Header = () => {
 				) : (
 					<></>
 				)}
-				<BsJournalBookmark className="w-8 h-8" />
 			</div>
 		</div>
 	);

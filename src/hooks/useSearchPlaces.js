@@ -24,7 +24,7 @@ const useSearchPlaces = () => {
 	const handleSearch = async () => {
 		try {
 			setLoading(true);
-			const { data } = await axiosClient.get(`/massage-places`);
+			const { data } = await axiosClient.get(`/massage-places?limit=100`);
 			setPlaces(data);
 			setLoading(false);
 		} catch (err) {

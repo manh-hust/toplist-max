@@ -1,4 +1,4 @@
-import { BsJournalBookmark, BsSearch } from 'react-icons/bs';
+import { BsSearch } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import logo from '../../../assets/images/logo-new.png';
@@ -28,7 +28,6 @@ const Header = () => {
 						handleSearch();
 					}}
 				/>
-				<BsJournalBookmark className="w-8 h-8" />
 			</div>
 		</div>
 	);
