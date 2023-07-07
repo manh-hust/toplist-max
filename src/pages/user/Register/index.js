@@ -18,7 +18,9 @@ import { LANGUAGES, LANGUAGE_LOGO } from '../../../constants/languages';
 import { storage } from '../../../firebase';
 import MainLayout from '../../../layouts/MainLayout';
 const { TextArea } = Input;
-
+const getUrlFirebase = (name) => {
+	return `https://firebasestorage.googleapis.com/v0/b/itss-maxa.appspot.com/o/images%2F${name}?alt=media`;
+};
 const Register = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [staffs, setStaffs] = useState([]);
@@ -42,8 +44,6 @@ const Register = () => {
 				...value,
 				staffs: staffs.staffs,
 			};
-			console.log('🚀 ~ file: index.js:45 ~ handleSubmit ~ data:', data);
-			return;
 			setIsLoading(true);
 			const response = await axiosClient.post('/massage-places', data);
 			if (response.success) {
@@ -178,15 +178,9 @@ const Register = () => {
 										className="ml-2"
 										onChange={async (e) => {
 											await uploadImage(e);
-											console.log(
-												'🚀 ~ file: index.js:185 ~ onChange={ ~ imageUrl:',
-												imageUrl
-											);
-											form1.setFieldsValue({ photoUrl: imageUrl });
-											console.log(
-												'🚀 ~ file: index.js:189 ~ onChange={ ~ form1:',
-												form1.getFieldValue('photoUrl')
-											);
+											form1.setFieldsValue({
+												photoUrl: getUrlFirebase(e.file.name),
+											});
 										}}
 									>
 										<div>
@@ -277,7 +271,7 @@ const Register = () => {
 																const fieldsValue = form2.getFieldsValue();
 																const { staffs } = fieldsValue;
 																await Object.assign(staffs[index], {
-																	image: imageUrl,
+																	image: getUrlFirebase(e.file.name),
 																});
 																form2.setFieldsValue({ staffs });
 															}}
