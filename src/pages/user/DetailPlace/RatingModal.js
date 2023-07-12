@@ -44,7 +44,7 @@ const RatingModal = ({ setNewRating }) => {
 				Rating
 			</Button>
 			<Modal
-				title="Comment"
+				title="Rating"
 				visible={visible}
 				onCancel={handleCancel}
 				footer={null}
