@@ -225,7 +225,7 @@ const DetailPlace = () => {
 								</Avatar.Group>
 							</div>
 							<div className="mb-12 flex items-start flex-col">
-								<span className="text-xl mr-4 mb-4">More information</span>
+								<span className="text-xl mr-4 mb-4">Description</span>
 								<TextArea
 									type="primary mb-12"
 									placeholder={place.reviewContent}
