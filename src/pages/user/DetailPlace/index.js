@@ -149,8 +149,6 @@ const DetailPlace = () => {
 		}
 	};
 
-	console.log(place);
-
 	return (
 		<MainLayout>
 			{contextHolder}
@@ -367,8 +365,12 @@ const DetailPlace = () => {
 											/>
 										</div>
 										<div className="mb-12 flex items-center">
-											<span className="text-xl mr-4">Sex</span>
-											<Input size="large" placeholder={null} disabled />
+											<span className="text-xl mr-4">Age</span>
+											<Input
+												size="large"
+												placeholder={selectedStaff.age}
+												disabled
+											/>
 										</div>
 										<div className="mb-12 flex items-center">
 											<span className="text-xl mr-4">Experience</span>
