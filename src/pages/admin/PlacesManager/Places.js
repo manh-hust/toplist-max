@@ -58,6 +58,7 @@ const Places = () => {
 				name: place.name,
 				address: place.address,
 				status: getStatus(place?.status),
+				description: place.reviewContent,
 				time: place.createdAt,
 				languages: place.serviceLanguages,
 			}));
@@ -174,9 +175,9 @@ const Places = () => {
 			...getColumnSearchProps('address'),
 		},
 		{
-			title: 'Phone number',
-			dataIndex: 'phone',
-			key: 'phone',
+			title: 'Description',
+			dataIndex: 'description',
+			key: 'description',
 			render: (text) => <span>{text || 'Not update'}</span>,
 		},
 		{
